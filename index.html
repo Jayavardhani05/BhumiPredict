@@ -1,40 +1,15 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --primary-navy: #123B5D;
-  --secondary-blue: #1D5D8F;
-  --light-blue: #EAF3F8;
-  --page-bg: #F5F7F9;
-  --card-bg: #FFFFFF;
-  --border-color: #D9E1E7;
-  --text-primary: #1F2937;
-  --text-secondary: #64748B;
-  --success: #198754;
-  --warning: #D99A00;
-  --danger: #C0392B;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--page-bg);
-  color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* Ensure Leaflet tiles and container match light theme */
-.leaflet-container {
-  width: 100%;
-  height: 100%;
-  background-color: #f1f5f9 !important;
-  font-family: inherit;
-}
-
-.custom-marker {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BhumiPredict: AI Land Acquisition Delay Intelligence Portal</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
