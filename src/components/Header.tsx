@@ -1,64 +1,54 @@
-import { Shield, LogOut, Bell, ChevronDown } from "lucide-react";
+import { Bell, Menu, ChevronDown } from "lucide-react";
 
 interface HeaderProps {
-  onLogout: () => void;
-  alertCount: number;
+  pageTitle: string;
+  onMenuClick: () => void;
   onAlertClick: () => void;
+  alertCount: number;
 }
 
-export default function Header({ onLogout, alertCount, onAlertClick }: HeaderProps) {
+export default function Header({ pageTitle, onMenuClick, onAlertClick, alertCount }: HeaderProps) {
   return (
-    <header className="bg-[#0f172a] border-b border-slate-700 shrink-0 z-[1000]">
-      <div className="flex items-center justify-between px-4 lg:px-6 h-14">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
-            <Shield className="w-5 h-5 text-white" />
-          </div>
-          <div className="hidden sm:block">
-            <h1 className="text-white font-bold text-sm leading-tight">BhumiPredict</h1>
-            <p className="text-slate-500 text-[10px] tracking-wider uppercase">AI Land Acquisition Intelligence · SIH 2026 · PS 26017</p>
-          </div>
-          <div className="sm:hidden">
-            <h1 className="text-white font-bold text-sm">BhumiPredict</h1>
-          </div>
+    <header className="bg-white border-b border-[#D9E1E7] h-14 flex items-center justify-between px-4 lg:px-6 shrink-0 z-10">
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden text-[#64748B] hover:text-[#123B5D]"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <div>
+          <h2 className="text-[#123B5D] font-semibold text-base">{pageTitle}</h2>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 lg:gap-4">
+        <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 bg-[#EAF3F8] border border-[#D9E1E7] rounded">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#198754]" />
+          <span className="text-[#64748B] text-[10px] font-medium">SIH 2026 · Prototype</span>
         </div>
 
-        <div className="flex items-center gap-2 lg:gap-4">
-          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-800 rounded-lg border border-slate-700">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-slate-300 text-xs font-medium">Live · Coimbatore DC Office</span>
+        <button
+          onClick={onAlertClick}
+          className="relative p-2 text-[#64748B] hover:text-[#123B5D] hover:bg-[#EAF3F8] rounded-lg transition-colors"
+        >
+          <Bell className="w-5 h-5" />
+          {alertCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 bg-[#C0392B] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+              {alertCount}
+            </span>
+          )}
+        </button>
+
+        <div className="flex items-center gap-2 pl-3 border-l border-[#D9E1E7]">
+          <div className="w-8 h-8 rounded-full bg-[#1D5D8F] flex items-center justify-center shrink-0">
+            <span className="text-white text-xs font-bold">KS</span>
           </div>
-
-          <button
-            onClick={onAlertClick}
-            className="relative p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-          >
-            <Bell className="w-5 h-5" />
-            {alertCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                {alertCount}
-              </span>
-            )}
-          </button>
-
-          <div className="flex items-center gap-2 pl-2 lg:pl-3 border-l border-slate-700">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0">
-              <span className="text-white text-xs font-bold">KS</span>
-            </div>
-            <div className="hidden lg:block">
-              <p className="text-white text-xs font-semibold leading-tight">Dr. K. Senthil Nathan, IAS</p>
-              <p className="text-slate-500 text-[10px]">District Collector & CALA</p>
-            </div>
-            <ChevronDown className="hidden lg:block w-4 h-4 text-slate-500" />
+          <div className="hidden lg:block">
+            <p className="text-[#1F2937] text-xs font-semibold leading-tight">Dr. K. Senthil Nathan, IAS</p>
+            <p className="text-[#64748B] text-[10px]">District Collector & CALA</p>
           </div>
-
-          <button
-            onClick={onLogout}
-            className="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-lg transition-colors"
-            title="Sign out"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
+          <ChevronDown className="hidden lg:block w-4 h-4 text-[#64748B]" />
         </div>
       </div>
     </header>
