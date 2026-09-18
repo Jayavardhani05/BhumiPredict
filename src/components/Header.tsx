@@ -1,56 +1,40 @@
-import { Bell, Menu, ChevronDown } from "lucide-react";
+import React from 'react';
+import { Bell, Shield } from 'lucide-react';
 
 interface HeaderProps {
-  pageTitle: string;
-  onMenuClick: () => void;
-  onAlertClick: () => void;
-  alertCount: number;
+  activeTitle: string;
 }
 
-export default function Header({ pageTitle, onMenuClick, onAlertClick, alertCount }: HeaderProps) {
+export const Header: React.FC<HeaderProps> = ({ activeTitle }) => {
   return (
-    <header className="bg-white border-b border-[#D9E1E7] h-14 flex items-center justify-between px-4 lg:px-6 shrink-0 z-10">
+    <header className="h-16 bg-white border-b border-[#D9E1E7] flex items-center justify-between px-8 sticky top-0 z-20 shadow-sm ml-64">
       <div className="flex items-center gap-3">
-        <button
-          onClick={onMenuClick}
-          className="lg:hidden text-[#64748B] hover:text-[#123B5D]"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-        <div>
-          <h2 className="text-[#123B5D] font-semibold text-base">{pageTitle}</h2>
-        </div>
+        <h2 className="text-[#123B5D] font-bold text-base capitalize tracking-tight">
+          {activeTitle.replace('-', ' ')}
+        </h2>
+        <span className="text-[11px] bg-[#EAF3F8] text-[#123B5D] px-2 py-0.5 rounded font-semibold border border-[#D9E1E7]">
+          Coimbatore & Western Corridor
+        </span>
       </div>
 
-      <div className="flex items-center gap-3 lg:gap-4">
-        <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 bg-[#EAF3F8] border border-[#D9E1E7] rounded">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#198754]" />
-          <span className="text-[#64748B] text-[10px] font-medium">SIH 2026 · Prototype</span>
-        </div>
+      <div className="flex items-center gap-4">
+        {/* Subtle Prototype Badge */}
+        <span className="flex items-center gap-1 text-[11px] bg-emerald-50 text-[#198754] px-2 py-0.5 rounded border border-emerald-200 font-medium">
+          <Shield size={11} /> SIH 2026 Evaluation Prototype
+        </span>
 
-        <button
-          onClick={onAlertClick}
-          className="relative p-2 text-[#64748B] hover:text-[#123B5D] hover:bg-[#EAF3F8] rounded-lg transition-colors"
-        >
-          <Bell className="w-5 h-5" />
-          {alertCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 bg-[#C0392B] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-              {alertCount}
-            </span>
-          )}
+        {/* Notifications Icon */}
+        <button className="relative p-1.5 text-[#64748B] hover:text-[#123B5D] rounded-full hover:bg-[#F5F7F9]">
+          <Bell size={16} />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-[#C0392B] rounded-full"></span>
         </button>
 
-        <div className="flex items-center gap-2 pl-3 border-l border-[#D9E1E7]">
-          <div className="w-8 h-8 rounded-full bg-[#1D5D8F] flex items-center justify-center shrink-0">
-            <span className="text-white text-xs font-bold">KS</span>
-          </div>
-          <div className="hidden lg:block">
-            <p className="text-[#1F2937] text-xs font-semibold leading-tight">Dr. K. Senthil Nathan, IAS</p>
-            <p className="text-[#64748B] text-[10px]">District Collector & CALA</p>
-          </div>
-          <ChevronDown className="hidden lg:block w-4 h-4 text-[#64748B]" />
+        {/* User Mini Tag */}
+        <div className="text-right border-l border-[#D9E1E7] pl-4">
+          <span className="text-xs font-bold text-[#1F2937] block leading-none">Dr. Senthil Nathan</span>
+          <span className="text-[10px] text-[#64748B]">CALA Nodal Head</span>
         </div>
       </div>
     </header>
   );
-}
+};
