@@ -1,119 +1,170 @@
-import { Link } from "react-router-dom";
-import { Building2, AlertTriangle, CheckCircle2, TrendingUp, ArrowRight, FileWarning, Gavel, Banknote } from "lucide-react";
-import { projects, tasks } from "@/data/projects";
-import StatCard from "@/components/StatCard";
-import RiskBadge from "@/components/RiskBadge";
-import MapView from "@/components/MapView";
+import React from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import { projects } from '../data/projects';
+import { AlertTriangle, Clock, CheckCircle2, ArrowRight } from 'lucide-react';
 
-export default function Dashboard() {
-  const activeProjects = projects.filter((p) => p.status.includes("Stage") || p.status.includes("imminent")).length;
-  const highRisk = projects.filter((p) => p.riskLevel === "high").length;
-  const avgProgress = Math.round(projects.reduce((s, p) => s + (p.parcelsAcquired / p.parcelsTotal) * 100, 0) / projects.length);
-  const urgentTasks = tasks.filter((t) => t.status === "urgent" || t.priority === "urgent").slice(0, 3);
+const createLightMarker = (risk: string) => {
+  const color = risk === 'HIGH' ? '#C0392B' : risk === 'MEDIUM' ? '#D99A00' : '#198754';
+  return new L.DivIcon({
+    className: 'custom-marker',
+    html: `<div style="background-color: ${color}; width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.25);"></div>`
+  });
+};
+
+interface DashboardProps {
+  onNavigate: (tab: string) => void;
+  onSelectProject: (p: any) => void;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onSelectProject }) => {
+  const highRiskCount = projects.filter(p => p.riskLevel === 'HIGH').length;
 
   return (
-    <div className="p-4 lg:p-6 space-y-6 max-w-[1600px] mx-auto">
-      {/* Welcome */}
-      <div>
-        <h1 className="text-[#123B5D] text-xl font-bold">Good afternoon, Dr. Senthil Nathan</h1>
-        <p className="text-[#64748B] text-sm mt-1">District Land Acquisition Overview · Coimbatore & Western Corridor</p>
-      </div>
-
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={Building2} label="Total Projects" value={projects.length} sublabel="4 corridors monitored" accentColor="#1D5D8F" />
-        <StatCard icon={TrendingUp} label="Active Projects" value={activeProjects} sublabel="Currently in progress" accentColor="#198754" />
-        <StatCard icon={AlertTriangle} label="High Risk Projects" value={highRisk} sublabel="Require immediate attention" accentColor="#C0392B" />
-        <StatCard icon={CheckCircle2} label="Avg. Acquisition Progress" value={`${avgProgress}%`} sublabel="Across all corridors" accentColor="#D99A00" />
-      </div>
-
-      {/* Map + Risk summary */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white border border-[#D9E1E7] rounded-lg overflow-hidden">
-          <div className="px-5 py-3 border-b border-[#D9E1E7] bg-[#EAF3F8] flex items-center justify-between">
-            <h3 className="text-[#123B5D] font-semibold text-sm">Project Risk Map · Tamil Nadu</h3>
-            <Link to="/gis-map" className="text-[#1D5D8F] hover:text-[#123B5D] text-xs font-medium flex items-center gap-1">
-              Full Map <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-          <div className="h-[400px] p-3">
-            <MapView projects={projects} height="100%" showLegend={true} showTitle={false} />
-          </div>
+    <div className="space-y-6">
+      {/* Welcome Banner */}
+      <div className="bg-white border border-[#D9E1E7] rounded-lg p-5 flex justify-between items-center shadow-sm">
+        <div>
+          <h3 className="text-lg font-bold text-[#123B5D]">Good morning, Dr. Senthil Nathan</h3>
+          <p className="text-xs text-[#64748B] mt-0.5">
+            District Land Acquisition Monitoring Overview • Priority Corridors
+          </p>
         </div>
+        <button
+          onClick={() => onNavigate('simulator')}
+          className="bg-[#123B5D] hover:bg-[#1D5D8F] text-white text-xs font-semibold px-4 py-2 rounded shadow-sm transition"
+        >
+          Open What-If Simulator
+        </button>
+      </div>
 
-        {/* Project Risk Summary */}
-        <div className="bg-white border border-[#D9E1E7] rounded-lg overflow-hidden flex flex-col">
-          <div className="px-5 py-3 border-b border-[#D9E1E7] bg-[#EAF3F8]">
-            <h3 className="text-[#123B5D] font-semibold text-sm">Project Risk Summary</h3>
-          </div>
-          <div className="p-3 flex-1 overflow-y-auto">
-            <div className="space-y-2">
-              {projects.map((p) => {
-                const pct = Math.round((p.parcelsAcquired / p.parcelsTotal) * 100);
-                return (
-                  <Link
-                    key={p.id}
-                    to={`/projects/${p.id}`}
-                    className="block p-3 border border-[#E5EAF0] rounded-md hover:border-[#1D5D8F]/30 hover:bg-[#F5F7F9] transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <p className="text-[#1F2937] text-xs font-semibold leading-tight">{p.name}</p>
-                      <RiskBadge level={p.riskLevel} />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-1.5 bg-[#E5EAF0] rounded-full overflow-hidden">
-                        <div className="h-full bg-[#1D5D8F] rounded-full" style={{ width: `${pct}%` }} />
-                      </div>
-                      <span className="text-[#64748B] text-[10px] font-mono">{pct}%</span>
-                    </div>
-                    <p className="text-[#64748B] text-[10px] mt-1.5">{p.location}</p>
-                  </Link>
-                );
-              })}
+      {/* 4 Summary Stat Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-lg border border-[#D9E1E7] shadow-sm">
+          <span className="text-[11px] text-[#64748B] font-bold uppercase tracking-wider block">Total Tracked</span>
+          <span className="text-2xl font-bold text-[#1F2937] block mt-1">{projects.length} Corridors</span>
+          <span className="text-[11px] text-[#64748B]">State Highway & Rail</span>
+        </div>
+        <div className="bg-white p-4 rounded-lg border border-[#D9E1E7] shadow-sm">
+          <span className="text-[11px] text-[#64748B] font-bold uppercase tracking-wider block">Active Acquisitions</span>
+          <span className="text-2xl font-bold text-[#123B5D] block mt-1">4 Corridors</span>
+          <span className="text-[11px] text-[#198754] font-medium">148.2 Hectares Surveyed</span>
+        </div>
+        <div className="bg-white p-4 rounded-lg border border-[#D9E1E7] shadow-sm">
+          <span className="text-[11px] text-[#C0392B] font-bold uppercase tracking-wider block">High Stall Risk</span>
+          <span className="text-2xl font-bold text-[#C0392B] block mt-1">{highRiskCount} Projects</span>
+          <span className="text-[11px] text-[#C0392B] font-medium">Requires Priority Clearance</span>
+        </div>
+        <div className="bg-white p-4 rounded-lg border border-[#D9E1E7] shadow-sm">
+          <span className="text-[11px] text-[#64748B] font-bold uppercase tracking-wider block">Overall Progress</span>
+          <span className="text-2xl font-bold text-[#198754] block mt-1">68.4%</span>
+          <span className="text-[11px] text-[#64748B]">Compensation Cadence Met</span>
+        </div>
+      </div>
+
+      {/* Main Map + Top Priority Side-Table */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Leaflet Light Map */}
+        <div className="lg:col-span-8 bg-white border border-[#D9E1E7] rounded-lg p-4 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <h4 className="text-xs font-bold text-[#123B5D] uppercase tracking-wider">
+                Geospatial Corridor Status (Tamil Nadu Grid)
+              </h4>
+              <button 
+                onClick={() => onNavigate('gis')}
+                className="text-xs text-[#1D5D8F] font-semibold hover:underline flex items-center gap-1"
+              >
+                Expand GIS View <ArrowRight size={12} />
+              </button>
             </div>
-            <Link
-              to="/projects"
-              className="mt-3 w-full flex items-center justify-center gap-1.5 bg-white border border-[#D9E1E7] hover:bg-[#EAF3F8] text-[#1D5D8F] text-xs font-medium py-2 rounded-md transition-colors"
-            >
-              View All Projects <ArrowRight className="w-3 h-3" />
-            </Link>
+
+            <div className="h-[400px] rounded border border-[#D9E1E7] overflow-hidden">
+              <MapContainer center={[11.0168, 77.5]} zoom={7} style={{ height: '100%', width: '100%' }}>
+                {/* Carto Positron Light Administrative Tiles */}
+                <TileLayer
+                  attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+                  url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                />
+                {projects.map((p) => (
+                  <Marker
+                    key={p.id}
+                    position={[p.coordinates.lat, p.coordinates.lng]}
+                    icon={createLightMarker(p.riskLevel)}
+                    eventHandlers={{ click: () => onSelectProject(p) }}
+                  >
+                    <Popup>
+                      <div className="p-1">
+                        <h5 className="font-bold text-xs text-[#123B5D]">{p.name}</h5>
+                        <p className="text-[11px] text-[#64748B]">{p.location}</p>
+                        <p className="text-[11px] font-bold mt-1">Risk: {p.riskScore}%</p>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
+            </div>
+          </div>
+
+          <div className="flex gap-4 text-[11px] text-[#64748B] pt-3 border-t border-[#D9E1E7] mt-3">
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#198754]"></span> Low Risk</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#D99A00]"></span> Alert (Medium)</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#C0392B]"></span> Critical High Risk</span>
           </div>
         </div>
-      </div>
 
-      {/* Urgent Actions */}
-      <div className="bg-white border border-[#D9E1E7] rounded-lg overflow-hidden">
-        <div className="px-5 py-3 border-b border-[#D9E1E7] bg-[#EAF3F8] flex items-center justify-between">
-          <h3 className="text-[#123B5D] font-semibold text-sm flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-[#D99A00]" />
-            Urgent Actions
-          </h3>
-          <Link to="/tasks" className="text-[#1D5D8F] hover:text-[#123B5D] text-xs font-medium flex items-center gap-1">
-            View All Actions <ArrowRight className="w-3 h-3" />
-          </Link>
-        </div>
-        <div className="divide-y divide-[#E5EAF0]">
-          {urgentTasks.map((t) => {
-            const Icon = t.title.includes("compensation") ? FileWarning : t.title.includes("affidavit") ? Gavel : Banknote;
-            const color = t.priority === "urgent" ? "#C0392B" : "#D99A00";
-            return (
-              <div key={t.id} className="flex items-start gap-3 px-5 py-3">
-                <Icon className="w-4 h-4 shrink-0 mt-0.5" style={{ color }} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[#1F2937] text-xs font-medium">{t.title}</p>
-                  <p className="text-[#64748B] text-[11px] mt-0.5">{t.project}</p>
+        {/* Priority Projects & Actions */}
+        <div className="lg:col-span-4 space-y-4">
+          <div className="bg-white border border-[#D9E1E7] rounded-lg p-4 shadow-sm">
+            <div className="flex justify-between items-center mb-3">
+              <h4 className="text-xs font-bold text-[#123B5D] uppercase tracking-wider">Priority Projects</h4>
+              <button onClick={() => onNavigate('projects')} className="text-[11px] text-[#1D5D8F] font-semibold hover:underline">
+                View All
+              </button>
+            </div>
+            <div className="space-y-2">
+              {projects.slice(0, 3).map((p) => (
+                <div 
+                  key={p.id}
+                  onClick={() => { onSelectProject(p); onNavigate('analytics'); }}
+                  className="p-2.5 rounded border border-[#D9E1E7] hover:border-[#123B5D] cursor-pointer bg-[#F5F7F9] transition"
+                >
+                  <div className="flex justify-between items-start">
+                    <span className="font-bold text-xs text-[#1F2937] leading-tight block">{p.name}</span>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                      p.riskLevel === 'HIGH' ? 'bg-rose-100 text-[#C0392B]' : 'bg-emerald-100 text-[#198754]'
+                    }`}>
+                      {p.riskScore}% Risk
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-[#64748B] block mt-1">{p.location} • Progress: {p.progress}%</span>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color }}>
-                    {t.daysLeft} days
-                  </p>
-                  <p className="text-[#64748B] text-[10px]">{t.dueDate}</p>
-                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white border border-[#D9E1E7] rounded-lg p-4 shadow-sm">
+            <div className="flex justify-between items-center mb-3">
+              <h4 className="text-xs font-bold text-[#C0392B] uppercase tracking-wider flex items-center gap-1">
+                <AlertTriangle size={13} /> Urgent Actions
+              </h4>
+              <button onClick={() => onNavigate('tasks')} className="text-[11px] text-[#1D5D8F] font-semibold hover:underline">
+                Tasks (3)
+              </button>
+            </div>
+            <div className="space-y-2 text-xs">
+              <div className="p-2 border-l-4 border-[#C0392B] bg-rose-50 rounded-r text-[#1F2937]">
+                <span className="font-bold block text-[11px]">Section 19 Notification Lapsing</span>
+                <span className="text-[10px] text-[#64748B]">NH-544 Bypass • Due in 12 days</span>
               </div>
-            );
-          })}
+              <div className="p-2 border-l-4 border-[#D99A00] bg-amber-50 rounded-r text-[#1F2937]">
+                <span className="font-bold block text-[11px]">Pending High Court Affidavit</span>
+                <span className="text-[10px] text-[#64748B]">Valuation dispute hearing on Friday</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
