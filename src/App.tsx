@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { Dashboard } from './pages/Dashboard';
-import { Projects } from './pages/Projects';
-import { Analytics } from './pages/Analytics';
-import { GISMapPage } from './pages/GISMapPage';
+import Projects from './pages/Projects';
+import Analytics from './pages/Analytics';
+import GISMapPage from './pages/GISMapPage';
 import { Simulator } from './pages/Simulator';
-import { Tasks } from './pages/Tasks';
+import Tasks from './pages/Tasks';
 import { projects } from './data/projects';
-import { Shield, Lock } from 'lucide-react';
+import { Shield } from 'lucide-react';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
